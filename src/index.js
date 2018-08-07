@@ -12,6 +12,17 @@ module.exports = function(config) {
         throw new Error('configuration is required.');
     }
 
+    var app = None,
+        database = None,
+        settings = None;
+
+    if (config.database) {
+        database = config.database;
+    } else {
+        app = firebase.initializeApp(config);
+        database = app.firestore();
+        settings = database.settings(config.settings);
+    }
     // Backwards compatibility shim
     var configuration = {};
     if (config.firebase_uri) {
@@ -22,12 +33,15 @@ module.exports = function(config) {
         configuration = config;
     }
 
-    var app = firebase.initializeApp(config),
-        database = app.database(),
-        rootRef = database.ref(),
-        teamsRef = rootRef.child('teams'),
-        usersRef = rootRef.child('users'),
-        channelsRef = rootRef.child('channels');
+    if (!config.settings) {
+        config.settings = {/* your settings... */ timestampsInSnapshots: true};
+    }
+
+
+    var rootRef = database,
+        teamsRef = rootRef.collection('teams'),
+        usersRef = rootRef.collection('users'),
+        channelsRef = rootRef.collection('channels');
 
     return {
         teams: {
@@ -56,8 +70,8 @@ module.exports = function(config) {
  */
 function get(firebaseRef) {
     return function(id, cb) {
-        firebaseRef.child(id).once('value').then(function(snapshot) {
-                cb(null, snapshot.val());
+        firebaseRef.doc(id).get().then(function(snapshot) {
+                cb(null, snapshot.data());
             },
             cb);
     };
@@ -73,7 +87,8 @@ function save(firebaseRef) {
     return function(data, cb) {
         var firebase_update = {};
         firebase_update[data.id] = data;
-        firebaseRef.update(firebase_update).then(cb);
+        console.log(firebaseRef, data);
+        firebaseRef.doc(data.id).set(data, {merge: true}).then(cb);
     };
 }
 
@@ -85,18 +100,18 @@ function save(firebaseRef) {
  */
 function all(firebaseRef) {
     return function(cb) {
-        firebaseRef.once('value').then(function success(records) {
-            var results = records.val();
+        firebaseRef.get().then(function success(records) {
+            // var results = records.val();
 
-            if (!results) {
+            if (!records.exists) {
                 return cb(null, []);
             }
 
-            var list = Object.keys(results).map(function(key) {
-                return results[key];
-            });
+            // var list = Object.keys(results).map(function(key) {
+            //     return results[key];
+            // });
 
-            cb(null, list);
+            cb(null, records.map(result => {result.data();}));
         }, cb);
     };
 }

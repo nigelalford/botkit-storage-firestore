@@ -1,5 +1,5 @@
 {
-  "name": "botkit-storage-firebase",
+  "name": "botkit-storage-firestore",
   "version": "1.0.1",
   "description": "Firebase driver for Botkit",
   "main": "index.js",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/howdyai/botkit-storage-firebase.git"
+    "url": "git+https://github.com/howdyai/botkit-storage-firestore.git"
   },
   "keywords": [
     "botkit",
@@ -18,11 +18,11 @@
   "author": "Cole Furfaro-Strode",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/howdyai/botkit-storage-firebase/issues"
+    "url": "https://github.com/howdyai/botkit-storage-firestore/issues"
   },
-  "homepage": "https://github.com/howdyai/botkit-storage-firebase#readme",
+  "homepage": "https://github.com/howdyai/botkit-storage-firestore#readme",
   "dependencies": {
-    "firebase": "^3.0.4"
+    "firebase": "^5.3.1"
   },
   "devDependencies": {
     "istanbul": "^0.4.1",
