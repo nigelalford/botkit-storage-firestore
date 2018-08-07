@@ -12,9 +12,9 @@ module.exports = function(config) {
         throw new Error('configuration is required.');
     }
 
-    var app = None,
-        database = None,
-        settings = None;
+    var app = null,
+        database = null,
+        settings = null;
 
     if (config.database) {
         database = config.database;
@@ -22,21 +22,21 @@ module.exports = function(config) {
         app = firebase.initializeApp(config);
         database = app.firestore();
         settings = database.settings(config.settings);
-    }
-    // Backwards compatibility shim
-    var configuration = {};
-    if (config.firebase_uri) {
-        configuration.databaseURL = config.firebase_uri;
-    } else if (!config.databaseURL) {
-        throw new Error('databaseURL is required.');
-    } else {
-        configuration = config;
-    }
 
-    if (!config.settings) {
-        config.settings = {/* your settings... */ timestampsInSnapshots: true};
-    }
+        // Backwards compatibility shim
+        var configuration = {};
+        if (config.firebase_uri) {
+            configuration.databaseURL = config.firebase_uri;
+        } else if (!config.databaseURL) {
+            throw new Error('databaseURL is required.');
+        } else {
+            configuration = config;
+        }
 
+        if (!config.settings) {
+            config.settings = {/* your settings... */ timestampsInSnapshots: true};
+        }
+    }
 
     var rootRef = database,
         teamsRef = rootRef.collection('teams'),
