@@ -1,7 +1,7 @@
 {
   "name": "botkit-storage-firestore",
-  "version": "1.0.1",
-  "description": "Firebase driver for Botkit",
+  "version": "1.0.3",
+  "description": "Firestore driver for Botkit",
   "main": "index.js",
   "scripts": {
     "pretest": "jscs ./",
@@ -15,7 +15,7 @@
     "botkit",
     "firebase"
   ],
-  "author": "Shishir Sharma <shishirsharma.in+npm@gmail.com> (https://shishirsharma.github.io/)",
+  "author": "Shishir Sharma",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/shishirsharma/botkit-storage-firestore/issues"

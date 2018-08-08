@@ -1,4 +1,4 @@
-# botkit-storage-firestore
+# botkit-storage-firestore [![Build Status](https://travis-ci.org/shishirsharma/botkit-storage-firestore.svg?branch=master)](https://travis-ci.org/shishirsharma/botkit-storage-firestore)
 
 A Firebase storage module for Botkit.
 
