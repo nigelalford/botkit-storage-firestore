@@ -11,24 +11,22 @@ module.exports = function(config) {
     if (!config) {
         throw new Error('configuration is required.');
     }
+    if (!config.databaseURL && !config.database) {
+        throw new Error('databaseURL or database is required.');
+    }
 
     var app = null,
         database = null,
         settings = null;
 
+
     if (config.database) {
         database = config.database;
     } else {
-        app = firebase.initializeApp(config);
-        database = app.firestore();
-        settings = database.settings(config.settings);
-
         // Backwards compatibility shim
         var configuration = {};
         if (config.firebase_uri) {
             configuration.databaseURL = config.firebase_uri;
-        } else if (!config.databaseURL) {
-            throw new Error('databaseURL is required.');
         } else {
             configuration = config;
         }
@@ -36,6 +34,11 @@ module.exports = function(config) {
         if (!config.settings) {
             config.settings = {/* your settings... */ timestampsInSnapshots: true};
         }
+
+        app = firebase.initializeApp(config);
+        database = app.firestore();
+        settings = database.settings(config.settings);
+
     }
 
     var rootRef = database,
@@ -87,7 +90,7 @@ function save(firebaseRef) {
     return function(data, cb) {
         var firebase_update = {};
         firebase_update[data.id] = data;
-        console.log(firebaseRef, data);
+
         firebaseRef.doc(data.id).set(data, {merge: true}).then(cb);
     };
 }
@@ -102,7 +105,7 @@ function all(firebaseRef) {
     return function(cb) {
         firebaseRef.get().then(function success(records) {
             // var results = records.val();
-
+            // console.log('all cb', cb, records);
             if (!records.exists) {
                 return cb(null, []);
             }
@@ -111,7 +114,7 @@ function all(firebaseRef) {
             //     return results[key];
             // });
 
-            cb(null, records.map(result => {result.data();}));
-        }, cb);
+            cb(null, records.map(result => result.data()));
+        });
     };
 }

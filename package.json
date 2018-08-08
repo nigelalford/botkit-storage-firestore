@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/howdyai/botkit-storage-firestore.git"
+    "url": "git+https://github.com/shishirsharma/botkit-storage-firestore.git"
   },
   "keywords": [
     "botkit",
@@ -18,9 +18,9 @@
   "author": "Cole Furfaro-Strode",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/howdyai/botkit-storage-firestore/issues"
+    "url": "https://github.com/shishirsharma/botkit-storage-firestore/issues"
   },
-  "homepage": "https://github.com/howdyai/botkit-storage-firestore#readme",
+  "homepage": "https://github.com/shishirsharma/botkit-storage-firestore#readme",
   "dependencies": {
     "firebase": "^5.3.1"
   },
