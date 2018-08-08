@@ -15,7 +15,7 @@
     "botkit",
     "firebase"
   ],
-  "author": "Cole Furfaro-Strode",
+  "author": "Shishir Sharma <shishirsharma.in+npm@gmail.com> (https://shishirsharma.github.io/)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/shishirsharma/botkit-storage-firestore/issues"
