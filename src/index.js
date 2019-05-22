@@ -14,6 +14,7 @@ module.exports = function(config) {
     if (!config.databaseURL && !config.database) {
         throw new Error('databaseURL or database is required.');
     }
+    config.methods = config.methods || [];
 
     var app = null,
         database = null,
@@ -42,28 +43,34 @@ module.exports = function(config) {
     }
 
     var rootRef = database,
-        teamsRef = rootRef.collection('teams'),
-        usersRef = rootRef.collection('users'),
-        channelsRef = rootRef.collection('channels');
+        storage = {},
+        collections = ['teams', 'users', 'channels'].concat(config.methods);
 
-    return {
-        teams: {
-            get: get(teamsRef),
-            save: save(teamsRef),
-            all: all(teamsRef)
-        },
-        channels: {
-            get: get(channelsRef),
-            save: save(channelsRef),
-            all: all(channelsRef)
-        },
-        users: {
-            get: get(usersRef),
-            save: save(usersRef),
-            all: all(usersRef)
-        }
-    };
+    // Implements required API methods
+    for (var i = 0; i < collections.length; i++) {
+        storage[collections[i]] = getStorageObj(rootRef.collection(collections[i]));
+    }
+    // console.log('config', config);
+    // console.log('storage', storage);
+    return storage;
 };
+
+
+
+/**
+ * Function to generate a storage object for a given namespace
+ *
+ * @param {Object} collection The firestore collection
+ * @returns {{get: get, save: save, all: all}}
+ */
+function getStorageObj(collection) {
+    return {
+        get: get(collection),
+        save: save(collection),
+        all: all(collection),
+        ref: collection
+    };
+}
 
 /**
  * Given a firebase ref, will return a function that will get a single value by ID
@@ -74,9 +81,8 @@ module.exports = function(config) {
 function get(firebaseRef) {
     return function(id, cb) {
         firebaseRef.doc(id).get().then(function(snapshot) {
-                cb(null, snapshot.data());
-            },
-            cb);
+            cb(null, snapshot.data());
+        }).catch(err => cb(err));
     };
 }
 
@@ -91,7 +97,13 @@ function save(firebaseRef) {
         var firebase_update = {};
         firebase_update[data.id] = data;
 
-        firebaseRef.doc(data.id).set(data, {merge: true}).then(cb);
+        firebaseRef.doc(data.id).set(data, {merge: true}).then(doc => {
+            if (!doc) {
+                cb('No such document!', null);
+            } else {
+                cb(null, doc);
+            }
+        });
     };
 }
 
@@ -106,7 +118,7 @@ function all(firebaseRef) {
         firebaseRef.get().then(function success(records) {
             // var results = records.val();
             // console.log('all cb', cb, records);
-            if (!records.exists) {
+            if (records.empty) {
                 return cb(null, []);
             }
 
@@ -114,7 +126,7 @@ function all(firebaseRef) {
             //     return results[key];
             // });
 
-            cb(null, records.map(result => result.data()));
+            cb(null, records.docs.map(result => result.data()));
         });
     };
 }
