@@ -1,4 +1,4 @@
-var firebase = require('firebase')
+var firebase = require('firebase');
 
 /**
  * The Botkit firebase driver
@@ -8,51 +8,51 @@ var firebase = require('firebase')
  */
 module.exports = function(config) {
   if (!config) {
-    throw new Error('configuration is required.')
+    throw new Error('configuration is required.');
   }
   if (!config.databaseURL && !config.database) {
-    throw new Error('databaseURL or database is required.')
+    throw new Error('databaseURL or database is required.');
   }
-  config.methods = config.methods || []
+  config.methods = config.methods || [];
 
   var app = null,
     database = null,
-    settings = null
+    settings = null;
 
   if (config.database) {
-    database = config.database
+    database = config.database;
   } else {
     // Backwards compatibility shim
-    var configuration = {}
+    var configuration = {};
     if (config.firebase_uri) {
-      configuration.databaseURL = config.firebase_uri
+      configuration.databaseURL = config.firebase_uri;
     } else {
-      configuration = config
+      configuration = config;
     }
 
     if (!config.settings) {
       config.settings = {
         /* your settings... */ timestampsInSnapshots: true,
-      }
+      };
     }
 
-    app = firebase.initializeApp(config)
-    database = app.firestore()
-    settings = database.settings(config.settings)
+    app = firebase.initializeApp(config);
+    database = app.firestore();
+    settings = database.settings(config.settings);
   }
 
   var rootRef = database,
     storage = {},
-    collections = ['teams', 'users', 'channels'].concat(config.methods)
+    collections = ['teams', 'users', 'channels'].concat(config.methods);
 
   // Implements required API methods
   for (var i = 0; i < collections.length; i++) {
-    storage[collections[i]] = getStorageObj(rootRef.collection(collections[i]))
+    storage[collections[i]] = getStorageObj(rootRef.collection(collections[i]));
   }
   // console.log('config', config);
   // console.log('storage', storage);
-  return storage
-}
+  return storage;
+};
 
 /**
  * Function to generate a storage object for a given namespace
@@ -69,7 +69,7 @@ function getStorageObj(collection) {
     all: all(collection),
     where: where(collection),
     ref: collection,
-  }
+  };
 }
 
 /**
@@ -84,10 +84,10 @@ function get(firebaseRef) {
       .doc(id)
       .get()
       .then(function(snapshot) {
-        cb(null, snapshot.data())
+        cb(null, snapshot.data());
       })
-      .catch(err => cb(err))
-  }
+      .catch(err => cb(err));
+  };
 }
 
 /**
@@ -98,20 +98,20 @@ function get(firebaseRef) {
  */
 function save(firebaseRef) {
   return function(data, cb) {
-    var firebase_update = {}
-    firebase_update[data.id] = data
+    var firebase_update = {};
+    firebase_update[data.id] = data;
 
     firebaseRef
       .doc(data.id)
       .set(data, { merge: true })
       .then(doc => {
         if (!doc) {
-          cb('No such document!', null)
+          cb('No such document!', null);
         } else {
-          cb(null, doc)
+          cb(null, doc);
         }
-      })
-  }
+      });
+  };
 }
 
 /**
@@ -126,16 +126,16 @@ function all(firebaseRef) {
       // var results = records.val();
       // console.log('all cb', cb, records);
       if (records.empty) {
-        return cb(null, [])
+        return cb(null, []);
       }
 
       // var list = Object.keys(results).map(function(key) {
       //     return results[key];
       // });
 
-      cb(null, records.docs.map(result => result.data()))
-    })
-  }
+      cb(null, records.docs.map(result => result.data()));
+    });
+  };
 }
 
 /**
@@ -151,12 +151,12 @@ function where(firebaseRef) {
       .get()
       .then(records => {
         if (records.empty) {
-          return cb(null, [])
+          return cb(null, []);
         }
 
-        cb(null, records.docs.map(result => result.data()))
-      })
-  }
+        cb(null, records.docs.map(result => result.data()));
+      });
+  };
 }
 
 /**
@@ -167,10 +167,10 @@ function where(firebaseRef) {
  */
 function nestedCollectionSave(firebaseRef) {
   return function(data, cb) {
-    var firebase_update = {}
-    firebase_update[data.id] = data
+    var firebase_update = {};
+    firebase_update[data.id] = data;
 
-    const document = data
+    const document = data;
 
     firebaseRef
       .doc(data.docId)
@@ -179,19 +179,18 @@ function nestedCollectionSave(firebaseRef) {
       .set(document, { merge: true })
       .then(doc => {
         if (!doc) {
-          cb('No such document!', null)
+          cb('No such document!', null);
         } else {
-          cb(null, doc)
+          cb(null, doc);
         }
-      })
-  }
+      });
+  };
 }
 
 /**
  * Given a firebase ref, will return a function that will save an object. The object must have an id property
  *
  * @param {Object} firebaseRef A reference to the firebase Object
- * @param {Object} data an object defining a document and subquery
  * @returns {Function} The save function
  */
 function nestedCollectionQuery(firebaseRef) {
@@ -203,9 +202,9 @@ function nestedCollectionQuery(firebaseRef) {
       .get()
       .then(records => {
         if (records.empty) {
-          return cb(null, [])
+          return cb(null, []);
         }
-        cb(null, records.docs.map(result => result.data()))
-      })
-  }
+        cb(null, records.docs.map(result => result.data()));
+      });
+  };
 }

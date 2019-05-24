@@ -10,5 +10,5 @@
     "requireCamelCaseOrUpperCaseIdentifiers": null,
     "requireCommaBeforeLineBreak": true,
     "requireCurlyBraces": null,
-    "validateIndentation": 4
+    "validateIndentation": 2
 }
