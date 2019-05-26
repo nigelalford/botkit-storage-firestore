@@ -13,11 +13,9 @@ module.exports = function(config) {
   if (!config.databaseURL && !config.database) {
     throw new Error('databaseURL or database is required.');
   }
-  config.methods = config.methods || [];
 
-  var app = null,
-    database = null,
-    settings = null;
+  var app = null;
+  var database = null;
 
   if (config.database) {
     database = config.database;
@@ -32,7 +30,7 @@ module.exports = function(config) {
 
     if (!config.settings) {
       config.settings = {
-        /* your settings... */ timestampsInSnapshots: true,
+        timestampsInSnapshots: true,
       };
     }
 
@@ -41,16 +39,19 @@ module.exports = function(config) {
     settings = database.settings(config.settings);
   }
 
-  var rootRef = database,
-    storage = {},
+  var rootRef = database;
+  var storage = {};
+  var collections;
+  if (config.menthods) {
     collections = ['teams', 'users', 'channels'].concat(config.methods);
+  } else {
+    collections = ['teams', 'users', 'channels'];
+  }
 
   // Implements required API methods
   for (var i = 0; i < collections.length; i++) {
     storage[collections[i]] = getStorageObj(rootRef.collection(collections[i]));
   }
-  // console.log('config', config);
-  // console.log('storage', storage);
   return storage;
 };
 
@@ -83,11 +84,21 @@ function get(firebaseRef) {
     firebaseRef
       .doc(id)
       .get()
-      .then(function(snapshot) {
-        cb(null, snapshot.data());
-      })
-      .catch(err => cb(err));
+      .then(snapshot => {
+        if (snapshot.data) {
+          cb(null, snapshot.data());
+        }
+      }, cb);
   };
+}
+
+function tester() {
+  firebaseRef
+    .doc(id)
+    .get()
+    .then(function(snapshot) {
+      cb(null, snapshot.data());
+    }, cb);
 }
 
 /**
@@ -194,7 +205,7 @@ function nestedCollectionSave(firebaseRef) {
  * @returns {Function} The save function
  */
 function nestedCollectionQuery(firebaseRef) {
-  return (data, cb) => {
+  return function(data, cb) {
     firebaseRef
       .doc(data.docId)
       .collection(data.subCollection)

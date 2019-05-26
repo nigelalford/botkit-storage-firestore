@@ -157,20 +157,21 @@ describe('Firebase', function() {
           jessepinkman: { id: 'jessepinkman', name: 'capncook' }
         };
 
-        records = [
-          {
-            data: function() {
-              return { id: 'walterwhite', name: 'heisenberg' };
+        records = {
+          docs: [
+            {
+              data: function() {
+                return { id: 'walterwhite', name: 'heisenberg' };
+              }
+            },
+            {
+              data: function() {
+                return { id: 'jessepinkman', name: 'capncook' };
+              }
             }
-          },
-          {
-            data: function() {
-              return { id: 'jessepinkman', name: 'capncook' };
-            }
-          }
-        ];
-        records.exists = true;
-        console.log('records', records);
+          ]
+        };
+        records.empty = false;
       });
 
       it('should get records', function() {
@@ -195,7 +196,7 @@ describe('Firebase', function() {
       it('should handle no records', function() {
         var cb = sinon.stub();
 
-        records.exists = undefined;
+        records.empty = true;
         refMock.get.returns({
           then: function(callback) {
             return callback(records);
