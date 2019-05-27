@@ -67,6 +67,7 @@ function getStorageObj(collection) {
     save: save(collection),
     nestedSave: nestedCollectionSave(collection),
     nestedQuery: nestedCollectionQuery(collection),
+    nestedCompoundQuery: nestedCollectionCompoundQuery(collection),
     all: all(collection),
     where: where(collection),
     ref: collection,
@@ -210,6 +211,31 @@ function nestedCollectionQuery(firebaseRef) {
       .doc(data.docId)
       .collection(data.subCollection)
       .where(data.query[0], data.query[1], data.query[2])
+      .get()
+      .then(records => {
+        if (records.empty) {
+          return cb(null, []);
+        }
+        cb(null, records.docs.map(result => result.data()));
+      });
+  };
+}
+
+/**
+ * Given a firebase ref, will return a function that will save an object. The object must have an id property
+ *
+ * @param {Object} firebaseRef A reference to the firebase Object
+ * @returns {Function} The save function
+ */
+function nestedCollectionCompoundQuery(firebaseRef) {
+  return function(data, cb) {
+    const first = data.query.first;
+    const second = data.query.second;
+    firebaseRef
+      .doc(data.docId)
+      .collection(data.subCollection)
+      .where(first[0], first[1], first[2])
+      .where(second[0], second[1], second[2])
       .get()
       .then(records => {
         if (records.empty) {

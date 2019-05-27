@@ -1,6 +1,6 @@
 {
   "name": "botkit-storage-firestore-v2",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Firestore driver for Botkit. Deeper integrations, including complex and subqueries",
   "main": "index.js",
   "scripts": {
